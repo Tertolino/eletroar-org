@@ -288,9 +288,13 @@ export function WeeklyPlanner() {
   const formatCurrency = (v: number) =>
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
 
-  const getServiceColor = (s: ServicoDB) => {
-    const tipo = s.servico_items?.[0]?.tipo || "";
-    return SERVICE_TYPE_COLORS[tipo] || "hsl(var(--muted-foreground))";
+  const getServiceType = (s: ServicoDB) => {
+    return s.servico_items?.[0]?.tipo || "Não informado";
+  };
+
+  const getServiceBorderClass = (s: ServicoDB) => {
+    const tipo = getServiceType(s);
+    return SERVICE_TYPE_BORDER_CLASS[tipo] || "border-l-border";
   };
 
   const dateOptions = useMemo(
