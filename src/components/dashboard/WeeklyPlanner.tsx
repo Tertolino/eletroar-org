@@ -32,15 +32,15 @@ import {
   type ServicoDB,
 } from "@/hooks/useServicosDB";
 
-// ── Color mapping by service type ──
-const SERVICE_TYPE_COLORS: Record<string, string> = {
-  "Instalação": "hsl(var(--primary))",
-  "Manutenção": "hsl(195 80% 50%)",
-  "Manutenção Técnica": "hsl(195 80% 50%)",
-  "Higienização": "hsl(45 90% 55%)",
-  "Reparo": "hsl(45 90% 55%)",
-  "Carga de Gás": "hsl(195 80% 50%)",
-  "Urgente": "hsl(var(--destructive))",
+// ── Color mapping by service type (tokens do design system) ──
+const SERVICE_TYPE_BORDER_CLASS: Record<string, string> = {
+  "Instalação": "border-l-primary",
+  "Manutenção": "border-l-secondary",
+  "Manutenção Técnica": "border-l-secondary",
+  "Reparo": "border-l-accent",
+  "Higienização": "border-l-accent",
+  "Reparo/Higienização": "border-l-accent",
+  "Urgente": "border-l-destructive",
 };
 
 const BACKLOG_TAGS: Record<string, { label: string; className: string }> = {
