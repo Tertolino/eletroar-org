@@ -51,38 +51,38 @@ export function useServicosWeekly(weekStart: string, weekEnd: string) {
   return useQuery({
     queryKey: ["servicos-weekly", weekStart, weekEnd],
     queryFn: async () => {
-      // Fetch servicos for the week range
+      // Campo real da data na tabela: "data" (tipo date)
       const { data: scheduled, error: e1 } = await supabase
         .from("servicos")
         .select("*, servico_items(*), tecnico_servico(*)")
         .gte("data", weekStart)
-        .lte("data", weekEnd)
-        .neq("status", "cancelado");
+        .lte("data", weekEnd);
 
       if (e1) throw e1;
 
-      // Fetch backlog (no date, not cancelled/concluded)
+      // Backlog = OS sem data agendada (NULL)
+      // (campo vazio "" não é válido para coluna date)
       const { data: backlog, error: e2 } = await supabase
         .from("servicos")
         .select("*, servico_items(*), tecnico_servico(*)")
-        .is("data", null)
-        .not("status", "in", '("cancelado","concluido")');
+        .is("data", null);
 
       if (e2) throw e2;
 
-      // Also fetch backlog with empty string dates
-      const { data: backlogEmpty, error: e3 } = await supabase
-        .from("servicos")
-        .select("*, servico_items(*), tecnico_servico(*)")
-        .eq("data", "")
-        .not("status", "in", '("cancelado","concluido")');
+      // DEBUG TEMPORÁRIO: se nada aparecer, imprime OSs e campo de data
+      if ((scheduled?.length || 0) === 0 && (backlog?.length || 0) === 0) {
+        const { data: debugRows } = await supabase
+          .from("servicos")
+          .select("id, cliente, data, status")
+          .order("created_at", { ascending: false })
+          .limit(100);
 
-      // Merge backlog results (ignore error on empty string query since data column is date type)
-      const allBacklog = [...(backlog || []), ...(backlogEmpty || [])];
+        console.log("[WeeklyPlanner][DEBUG] OSs buscadas e campo de data", debugRows);
+      }
 
       return {
         scheduled: (scheduled || []) as ServicoDB[],
-        backlog: allBacklog as ServicoDB[],
+        backlog: (backlog || []) as ServicoDB[],
       };
     },
   });

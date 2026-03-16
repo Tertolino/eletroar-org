@@ -32,15 +32,15 @@ import {
   type ServicoDB,
 } from "@/hooks/useServicosDB";
 
-// ── Color mapping by service type ──
-const SERVICE_TYPE_COLORS: Record<string, string> = {
-  "Instalação": "hsl(var(--primary))",
-  "Manutenção": "hsl(195 80% 50%)",
-  "Manutenção Técnica": "hsl(195 80% 50%)",
-  "Higienização": "hsl(45 90% 55%)",
-  "Reparo": "hsl(45 90% 55%)",
-  "Carga de Gás": "hsl(195 80% 50%)",
-  "Urgente": "hsl(var(--destructive))",
+// ── Color mapping by service type (tokens do design system) ──
+const SERVICE_TYPE_BORDER_CLASS: Record<string, string> = {
+  "Instalação": "border-l-primary",
+  "Manutenção": "border-l-secondary",
+  "Manutenção Técnica": "border-l-secondary",
+  "Reparo": "border-l-accent",
+  "Higienização": "border-l-accent",
+  "Reparo/Higienização": "border-l-accent",
+  "Urgente": "border-l-destructive",
 };
 
 const BACKLOG_TAGS: Record<string, { label: string; className: string }> = {
@@ -288,9 +288,13 @@ export function WeeklyPlanner() {
   const formatCurrency = (v: number) =>
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
 
-  const getServiceColor = (s: ServicoDB) => {
-    const tipo = s.servico_items?.[0]?.tipo || "";
-    return SERVICE_TYPE_COLORS[tipo] || "hsl(var(--muted-foreground))";
+  const getServiceType = (s: ServicoDB) => {
+    return s.servico_items?.[0]?.tipo || "Não informado";
+  };
+
+  const getServiceBorderClass = (s: ServicoDB) => {
+    const tipo = getServiceType(s);
+    return SERVICE_TYPE_BORDER_CLASS[tipo] || "border-l-border";
   };
 
   const dateOptions = useMemo(
@@ -356,19 +360,22 @@ export function WeeklyPlanner() {
                     </div>
 
                     <div className="flex-1 space-y-1.5">
-                      {dayServicos.map((s) => (
-                        <div
-                          key={s.id}
-                          className="rounded-md bg-muted/40 p-1.5 text-xs border-l-2 cursor-default"
-                          style={{ borderLeftColor: getServiceColor(s) }}
-                        >
-                          <p className="font-medium text-foreground truncate">OS #{s.id.slice(0, 6)}</p>
-                          <p className="text-muted-foreground truncate">{s.cliente || "Sem cliente"}</p>
-                          <p className="text-muted-foreground truncate">
-                            {s.tecnico_servico?.[0]?.tecnico_nome?.split(" ")[0] || "—"}
-                          </p>
-                        </div>
-                      ))}
+                      {dayServicos.map((s) => {
+                        const tipoServico = getServiceType(s);
+                        const tecnicoResponsavel = s.tecnico_servico?.[0]?.tecnico_nome || "Não atribuído";
+
+                        return (
+                          <div
+                            key={s.id}
+                            className={`rounded-md bg-muted/40 p-1.5 text-xs border-l-4 cursor-default ${getServiceBorderClass(s)}`}
+                          >
+                            <p className="font-medium text-foreground truncate" title={s.id}>OS #{s.id.slice(0, 8)}</p>
+                            <p className="text-muted-foreground truncate">{s.cliente || "Sem cliente"}</p>
+                            <p className="text-muted-foreground truncate">{tipoServico}</p>
+                            <p className="text-muted-foreground truncate">{tecnicoResponsavel}</p>
+                          </div>
+                        );
+                      })}
                     </div>
 
                     {/* "+ OS" button */}
