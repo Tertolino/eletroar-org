@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import OrdensServico from "./pages/OrdensServico";
@@ -29,24 +30,24 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          {/* Auth */}
+          {/* Auth - Public */}
           <Route path="/login" element={<LoginPage />} />
           
-          {/* Climatização */}
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/cadastrar-ordem" element={<CadastrarOrdem />} />
-          <Route path="/editar-ordem/:id" element={<EditarOrdem />} />
-          <Route path="/ordens" element={<OrdensServico />} />
-          <Route path="/historico" element={<Historico />} />
-          <Route path="/tecnicos" element={<Tecnicos />} />
-          <Route path="/financeiro" element={<Financeiro />} />
-          <Route path="/configuracoes" element={<Configuracoes />} />
+          {/* Climatização - Protected */}
+          <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/cadastrar-ordem" element={<ProtectedRoute><CadastrarOrdem /></ProtectedRoute>} />
+          <Route path="/editar-ordem/:id" element={<ProtectedRoute><EditarOrdem /></ProtectedRoute>} />
+          <Route path="/ordens" element={<ProtectedRoute><OrdensServico /></ProtectedRoute>} />
+          <Route path="/historico" element={<ProtectedRoute><Historico /></ProtectedRoute>} />
+          <Route path="/tecnicos" element={<ProtectedRoute><Tecnicos /></ProtectedRoute>} />
+          <Route path="/financeiro" element={<ProtectedRoute><Financeiro /></ProtectedRoute>} />
+          <Route path="/configuracoes" element={<ProtectedRoute><Configuracoes /></ProtectedRoute>} />
           
-          {/* Mercado Livre */}
-          <Route path="/ml/produtos" element={<ProdutosML />} />
-          <Route path="/ml/cadastrar" element={<CadastroProdutoML />} />
-          <Route path="/ml/break-even" element={<BreakEvenML />} />
-          <Route path="/ml/configuracoes" element={<ConfiguracoesML />} />
+          {/* Mercado Livre - Protected */}
+          <Route path="/ml/produtos" element={<ProtectedRoute><ProdutosML /></ProtectedRoute>} />
+          <Route path="/ml/cadastrar" element={<ProtectedRoute><CadastroProdutoML /></ProtectedRoute>} />
+          <Route path="/ml/break-even" element={<ProtectedRoute><BreakEvenML /></ProtectedRoute>} />
+          <Route path="/ml/configuracoes" element={<ProtectedRoute><ConfiguracoesML /></ProtectedRoute>} />
           
           <Route path="*" element={<NotFound />} />
         </Routes>
