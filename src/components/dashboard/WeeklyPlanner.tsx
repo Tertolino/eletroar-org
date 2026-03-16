@@ -360,19 +360,22 @@ export function WeeklyPlanner() {
                     </div>
 
                     <div className="flex-1 space-y-1.5">
-                      {dayServicos.map((s) => (
-                        <div
-                          key={s.id}
-                          className="rounded-md bg-muted/40 p-1.5 text-xs border-l-2 cursor-default"
-                          style={{ borderLeftColor: getServiceColor(s) }}
-                        >
-                          <p className="font-medium text-foreground truncate">OS #{s.id.slice(0, 6)}</p>
-                          <p className="text-muted-foreground truncate">{s.cliente || "Sem cliente"}</p>
-                          <p className="text-muted-foreground truncate">
-                            {s.tecnico_servico?.[0]?.tecnico_nome?.split(" ")[0] || "—"}
-                          </p>
-                        </div>
-                      ))}
+                      {dayServicos.map((s) => {
+                        const tipoServico = getServiceType(s);
+                        const tecnicoResponsavel = s.tecnico_servico?.[0]?.tecnico_nome || "Não atribuído";
+
+                        return (
+                          <div
+                            key={s.id}
+                            className={`rounded-md bg-muted/40 p-1.5 text-xs border-l-4 cursor-default ${getServiceBorderClass(s)}`}
+                          >
+                            <p className="font-medium text-foreground truncate" title={s.id}>OS #{s.id.slice(0, 8)}</p>
+                            <p className="text-muted-foreground truncate">{s.cliente || "Sem cliente"}</p>
+                            <p className="text-muted-foreground truncate">{tipoServico}</p>
+                            <p className="text-muted-foreground truncate">{tecnicoResponsavel}</p>
+                          </div>
+                        );
+                      })}
                     </div>
 
                     {/* "+ OS" button */}
