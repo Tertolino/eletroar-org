@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -43,27 +44,38 @@ export default function LoginPage() {
     if (!validateForm()) return;
     
     setIsLoading(true);
+
+    if (isSignUp) {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: window.location.origin },
+      });
+
+      if (error) {
+        toast({ title: "Erro ao criar conta", description: error.message, variant: "destructive" });
+        setIsLoading(false);
+        return;
+      }
+
+      toast({
+        title: "Conta criada!",
+        description: "Verifique seu email para confirmar o cadastro.",
+      });
+      setIsLoading(false);
+      setIsSignUp(false);
+      return;
+    }
     
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      toast({
-        title: "Erro ao fazer login",
-        description: error.message,
-        variant: "destructive",
-      });
+      toast({ title: "Erro ao fazer login", description: error.message, variant: "destructive" });
       setIsLoading(false);
       return;
     }
     
-    toast({
-      title: "Login realizado com sucesso!",
-      description: "Bem-vindo ao sistema Novo Eletroar",
-    });
-    
+    toast({ title: "Login realizado com sucesso!", description: "Bem-vindo ao sistema Novo Eletroar" });
     setIsLoading(false);
     navigate("/");
   };
@@ -92,8 +104,8 @@ export default function LoginPage() {
             >
               <img src={logo} alt="Novo Eletroar Climatização" className="h-16 object-contain" />
             </motion.div>
-            <h1 className="text-2xl font-bold text-foreground">Bem-vindo de volta</h1>
-            <p className="text-muted-foreground mt-2">Acesse sua conta para continuar</p>
+            <h1 className="text-2xl font-bold text-foreground">{isSignUp ? "Criar conta" : "Bem-vindo de volta"}</h1>
+            <p className="text-muted-foreground mt-2">{isSignUp ? "Preencha os dados para se cadastrar" : "Acesse sua conta para continuar"}</p>
           </CardHeader>
           
           <CardContent className="pt-6">
@@ -168,11 +180,21 @@ export default function LoginPage() {
                 ) : (
                   <>
                     <LogIn className="w-5 h-5" />
-                    Entrar
+                    {isSignUp ? "Cadastrar" : "Entrar"}
                   </>
                 )}
               </Button>
             </form>
+
+            <div className="mt-4 text-center">
+              <button
+                type="button"
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="text-sm text-primary hover:underline"
+              >
+                {isSignUp ? "Já tem conta? Fazer login" : "Não tem conta? Cadastre-se"}
+              </button>
+            </div>
           </CardContent>
         </Card>
 
