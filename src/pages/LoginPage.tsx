@@ -104,8 +104,8 @@ export default function LoginPage() {
             >
               <img src={logo} alt="Novo Eletroar Climatização" className="h-16 object-contain" />
             </motion.div>
-            <h1 className="text-2xl font-bold text-foreground">Bem-vindo de volta</h1>
-            <p className="text-muted-foreground mt-2">Acesse sua conta para continuar</p>
+            <h1 className="text-2xl font-bold text-foreground">{isSignUp ? "Criar conta" : "Bem-vindo de volta"}</h1>
+            <p className="text-muted-foreground mt-2">{isSignUp ? "Preencha os dados para se cadastrar" : "Acesse sua conta para continuar"}</p>
           </CardHeader>
           
           <CardContent className="pt-6">
