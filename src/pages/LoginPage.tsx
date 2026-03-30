@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -43,27 +44,38 @@ export default function LoginPage() {
     if (!validateForm()) return;
     
     setIsLoading(true);
+
+    if (isSignUp) {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: window.location.origin },
+      });
+
+      if (error) {
+        toast({ title: "Erro ao criar conta", description: error.message, variant: "destructive" });
+        setIsLoading(false);
+        return;
+      }
+
+      toast({
+        title: "Conta criada!",
+        description: "Verifique seu email para confirmar o cadastro.",
+      });
+      setIsLoading(false);
+      setIsSignUp(false);
+      return;
+    }
     
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      toast({
-        title: "Erro ao fazer login",
-        description: error.message,
-        variant: "destructive",
-      });
+      toast({ title: "Erro ao fazer login", description: error.message, variant: "destructive" });
       setIsLoading(false);
       return;
     }
     
-    toast({
-      title: "Login realizado com sucesso!",
-      description: "Bem-vindo ao sistema Novo Eletroar",
-    });
-    
+    toast({ title: "Login realizado com sucesso!", description: "Bem-vindo ao sistema Novo Eletroar" });
     setIsLoading(false);
     navigate("/");
   };
