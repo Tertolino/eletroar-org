@@ -180,7 +180,7 @@ export default function LoginPage() {
                 ) : (
                   <>
                     <LogIn className="w-5 h-5" />
-                    Entrar
+                    {isSignUp ? "Cadastrar" : "Entrar"}
                   </>
                 )}
               </Button>
